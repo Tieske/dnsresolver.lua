@@ -1,9 +1,12 @@
 -- Copyright (C) Yichun Zhang (agentzh)
+-- This is a modified version of the OpenResty library. It's been updated
+-- to work with regular Lua and LuaSocket.
 
+-- ngx replacements
+local socket = require("socket")
 
--- local socket = require "socket"
 local bit = require "bit"
-local udp = ngx.socket.udp
+local udp = socket.udp --ngx.socket.udp
 local rand = math.random
 local char = string.char
 local byte = string.byte
@@ -17,12 +20,12 @@ local rshift = bit.rshift
 local lshift = bit.lshift
 local insert = table.insert
 local concat = table.concat
-local re_sub = ngx.re.sub
-local tcp = ngx.socket.tcp
-local log = ngx.log
-local DEBUG = ngx.DEBUG
+--local re_sub = ngx.re.sub
+local tcp = socket.tcp --ngx.socket.tcp
+--local log = ngx.log
+--local DEBUG = ngx.DEBUG
 local randomseed = math.randomseed
-local ngx_time = ngx.time
+local ngx_time = socket.gettime --ngx.time
 local unpack = unpack
 local setmetatable = setmetatable
 local type = type
@@ -317,8 +320,8 @@ local function parse_response(buf, id)
 
     if ans_id ~= id then
         -- identifier mismatch and throw it away
-        log(DEBUG, "id mismatch in the DNS reply: ", ans_id, " ~= ", id)
-        return nil, "id mismatch"
+        --log(DEBUG, "id mismatch in the DNS reply: ", ans_id, " ~= ", id)
+        return nil, "id mismatch in the DNS reply: " .. tostring(ans_id) .. " ~= " ..tostring(id)
     end
 
     local flags_hi = byte(buf, 3)
@@ -535,7 +538,8 @@ local function parse_response(buf, id)
 
             pos = p
 
-        elseif typ == TYPE_SRV then
+      elseif typ == TYPE_SRV then
+
             if len < 7 then
                 return nil, "bad SRV record value length: " .. len
             end
@@ -669,7 +673,7 @@ local function _tcp_query(self, query, id)
         return nil, "not initialized"
     end
 
-    log(DEBUG, "query the TCP server due to reply truncation")
+    --log(DEBUG, "query the TCP server due to reply truncation")
 
     local server = _get_cur_server(self)
 
@@ -685,7 +689,7 @@ local function _tcp_query(self, query, id)
     local len_hi = char(rshift(len, 8))
     local len_lo = char(band(len, 0xff))
 
-    local bytes, err = sock:send({len_hi, len_lo, query})
+    local bytes, err = sock:send(len_hi .. len_lo .. query)
     if not bytes then
         return nil, "failed to send query to TCP server "
             .. concat(server, ":") .. ": " .. err
@@ -763,7 +767,8 @@ function _M.query(self, qname, opts)
     for i = 1, retrans do
         local sock = pick_sock(self, socks)
 
-        local ok, err = sock:send(query)
+        local ok, err = sock:send(concat(query))
+
         if not ok then
             local server = _get_cur_server(self)
             return nil, "failed to send request to UDP server "

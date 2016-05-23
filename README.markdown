@@ -1,3 +1,10 @@
+NOTICE:
+=======
+
+This is a modified version of the OpenResty library. It's been updated
+to work with regular Lua and LuaSocket. Below is the original readme file.
+
+
 Name
 ====
 

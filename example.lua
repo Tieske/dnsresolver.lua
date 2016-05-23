@@ -34,6 +34,9 @@ go ("smtp.thijsschreijer.nl", "A")
 print "Multiple SRV records"
 go ("srvtest.thijsschreijer.nl", "SRV")
 
+print "CNAME to multiple SRV records"
+go ("cname2srv.thijsschreijer.nl", "SRV")
+
 print "Non-matching type records"
 go ("srvtest.thijsschreijer.nl", "A") --> not an A but an SRV type
 

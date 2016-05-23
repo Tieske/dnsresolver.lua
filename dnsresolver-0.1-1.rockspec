@@ -1,4 +1,4 @@
-package = "dns"
+package = "dnsresolver"
 version = "0.1-1"
 source = {
   url = "https://github.com/Mashape/dnsutils.lua/archive/version_1.0.tar.gz",
@@ -21,6 +21,6 @@ dependencies = {
 build = {
   type = "builtin",
   modules = {
-    ["resty.dns.resolver"] = "lib/resty/dns/resolver.lua",
+    ["dns.resolver"] = "lib/resty/dns/resolver.lua",
   },
 }
